@@ -1,5 +1,7 @@
 
 Library/build/
+Library/dist/
 Library/nbproject/
 Server/build/
 Server/nbproject/
+Server/dist/

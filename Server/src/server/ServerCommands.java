@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
@@ -18,6 +19,7 @@ import java.util.Base64;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.User;
 import networking.Command;
 
 public class ServerCommands {
@@ -59,9 +61,9 @@ public class ServerCommands {
                     password += salt;
                     byte[] passwordShClient = messageDigest.digest(password.getBytes());
                     byte[] passwordSh = res.getBytes("password");
-                    
+
                     boolean match = Arrays.equals(passwordSh, passwordShClient);
-                    
+
                     if (match) {
                         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                         dataOutputStream.writeInt(res.getInt("id"));
@@ -90,6 +92,32 @@ public class ServerCommands {
                 socket.getOutputStream().write(result ? 1 : 0);
             }
         } catch (SQLException | NoSuchAlgorithmException ex) {
+            Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Command
+    private void searchUser(Socket socket, String query) throws IOException {
+        String sql = "SELECT id, username FROM users WHERE username LIKE ?";
+        if (query == null) {
+            query = "%%";
+        } else {
+            query = '%' + query + '%';
+        }
+
+        try ( PreparedStatement statement = this.connection.prepareStatement(sql)) {
+            statement.setString(1, query);
+            
+            try (ResultSet res = statement.executeQuery()) {
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                while (res.next()) {
+                    User user = new User();
+                    user.setUsername(res.getString("username"));
+                    user.setId(res.getInt("id"));
+                    oos.writeUnshared(user);
+                }
+            }
+        } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
