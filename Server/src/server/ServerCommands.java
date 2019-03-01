@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.User;
 import networking.Command;
+import networking.Protocol;
 
 public class ServerCommands {
 
@@ -65,8 +66,8 @@ public class ServerCommands {
                     boolean match = Arrays.equals(passwordSh, passwordShClient);
 
                     if (match) {
-                        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                        dataOutputStream.writeInt(res.getInt("id"));
+                        Integer result = res.getInt("id");
+                        Protocol.sendResult(socket.getOutputStream(), result);
                     }
                 }
             }
@@ -98,7 +99,7 @@ public class ServerCommands {
 
     @Command
     private void searchUser(Socket socket, String query) throws IOException {
-        String sql = "SELECT id, username FROM users WHERE username LIKE ?";
+        String sql = "SELECT id, username, ip FROM users WHERE username LIKE ?";
         if (query == null) {
             query = "%%";
         } else {
@@ -114,6 +115,7 @@ public class ServerCommands {
                     User user = new User();
                     user.setUsername(res.getString("username"));
                     user.setId(res.getInt("id"));
+                    user.setIp(res.getString("ip"));
                     oos.writeUnshared(user);
                 }
             }

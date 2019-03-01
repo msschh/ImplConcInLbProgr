@@ -5,3 +5,6 @@ Library/nbproject/
 Server/build/
 Server/nbproject/
 Server/dist/
+/Client/nbproject/private/
+/Client/build/
+/Client/dist/

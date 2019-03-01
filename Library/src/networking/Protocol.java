@@ -2,6 +2,7 @@ package networking;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.TreeMap;
@@ -11,7 +12,7 @@ public final class Protocol {
 
     public static final Logger LOG = Logger.getLogger(Protocol.class.getName());
 
-    public static final int PORT = 5738;
+    public static final int PORT = 3456;
     public static final int NOTIFICATION_PORT = Protocol.PORT + 1;
 
     public static final int OK = 0;
@@ -48,6 +49,11 @@ public final class Protocol {
     public static void sendResult(OutputStream out, Object result) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(out);
         oos.writeUnshared(result);
+    }
+    
+    public static <R> R readResult(InputStream in) throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(in);
+        return (R) ois.readUnshared();
     }
 
     public static TreeMap<String, String> wildcardMatch(String path, String wild) {
