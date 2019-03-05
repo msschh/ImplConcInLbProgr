@@ -1,7 +1,6 @@
 package visual;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
