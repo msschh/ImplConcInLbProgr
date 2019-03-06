@@ -52,9 +52,9 @@ public class ServerCommands {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 
             String sql = "SELECT * FROM users WHERE username LIKE ?";
-            try ( PreparedStatement prepareStatement = this.connection.prepareStatement(sql)) {
+            try (PreparedStatement prepareStatement = this.connection.prepareStatement(sql)) {
                 prepareStatement.setString(1, username);
-                try ( ResultSet res = prepareStatement.executeQuery()) {
+                try (ResultSet res = prepareStatement.executeQuery()) {
                     if (!res.next()) {
                         return;
                     }
@@ -79,12 +79,22 @@ public class ServerCommands {
     @Command
     private void createUser(Socket socket, String username, String password) throws IOException {
         try {
+            String sql = "SELECT * FROM users WHERE username LIKE ?";
+            try (PreparedStatement prepareStatement = this.connection.prepareStatement(sql)) {
+                prepareStatement.setString(1, username);
+                try (ResultSet rs = prepareStatement.executeQuery()) {
+                    if (rs.next()) {
+                        socket.getOutputStream().write(0);
+                    }
+                }
+            }
+
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             String salt = this.createSalt();
             password += salt;
             byte[] passwordSh = messageDigest.digest(password.getBytes());
 
-            try ( PreparedStatement prepareStatement = this.connection.prepareStatement("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)")) {
+            try (PreparedStatement prepareStatement = this.connection.prepareStatement("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)")) {
                 prepareStatement.setString(1, username);
                 prepareStatement.setBlob(2, new ByteArrayInputStream(passwordSh));
                 prepareStatement.setString(3, salt);
@@ -106,9 +116,9 @@ public class ServerCommands {
             query = '%' + query + '%';
         }
 
-        try ( PreparedStatement statement = this.connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
             statement.setString(1, query);
-            
+
             try (ResultSet res = statement.executeQuery()) {
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                 while (res.next()) {

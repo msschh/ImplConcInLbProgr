@@ -1,6 +1,7 @@
 package visual;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,6 +11,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -23,6 +27,12 @@ public class LoginApplication extends Application {
     private TextField username;
     @FXML
     private PasswordField password;
+    @FXML
+    private TextField createUsername;
+    @FXML
+    private PasswordField createPassword;
+    @FXML
+    private PasswordField createRePassword;
 
     private final CommandClient client = new CommandClient("localhost", Protocol.PORT);
 
@@ -55,6 +65,37 @@ public class LoginApplication extends Application {
             } catch (EOFException e) {
                 JOptionPane.showMessageDialog(null, "Wrong username or password");
             }
+        });
+    }
+
+    @FXML
+    private void createAccount(ActionEvent event) {
+        String u = this.createUsername.getText();
+        String p = this.createPassword.getText();
+        String rp = this.createRePassword.getText();
+
+        if (!p.equals(rp)) {
+            Alert alert = new Alert(AlertType.ERROR, "Passwords do not match", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+
+        Object[] parameters = new Object[]{u, p};
+        this.client.call("loginUser", parameters, socket -> {
+            try {
+                int success = socket.getInputStream().read();
+                if (success == 1) {
+                    
+                } else if (success == 0) {
+                    Alert alert = new Alert(AlertType.ERROR, "Existent username!", ButtonType.OK);
+                    alert.showAndWait();
+                }
+                return;
+            } catch (IOException ioe) {
+            }
+
+            Alert alert = new Alert(AlertType.ERROR, "Server related error!", ButtonType.OK);
+            alert.showAndWait();
         });
     }
 
