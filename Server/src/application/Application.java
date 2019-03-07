@@ -1,11 +1,5 @@
 package application;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import networking.CommandClient;
 import networking.CommandServer;
 import networking.Protocol;
 import server.ServerCommands;
@@ -18,7 +12,7 @@ public class Application {
         commandServer.setCommands(commands);
         new Thread(commandServer).start();
 
-        CommandClient cc = new CommandClient("localhost", Protocol.PORT);
+        /*CommandClient cc = new CommandClient("localhost", Protocol.PORT);
         Object[] params = new Object[]{"test", "test"};
         cc.call("loginUser", params, true, socket -> {
             try {
@@ -45,6 +39,6 @@ public class Application {
                 Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-        });
+        });*/
     }
 }

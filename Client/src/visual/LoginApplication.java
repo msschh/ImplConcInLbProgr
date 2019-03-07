@@ -81,7 +81,7 @@ public class LoginApplication extends Application {
         }
 
         Object[] parameters = new Object[]{u, p};
-        this.client.call("loginUser", parameters, socket -> {
+        this.client.call("createUser", parameters, socket -> {
             try {
                 int success = socket.getInputStream().read();
                 if (success == 1) {

@@ -1,7 +1,6 @@
 package server;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.io.IOException;
