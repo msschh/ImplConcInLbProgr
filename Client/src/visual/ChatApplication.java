@@ -52,6 +52,12 @@ public class ChatApplication extends Application {
         });
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop(); //To change body of generated methods, choose Tools | Templates.
+        this.chatConnection.stop();
+    }
+
     @FXML
     private void onSend(ActionEvent event) {
         String message = this.message.getText();
