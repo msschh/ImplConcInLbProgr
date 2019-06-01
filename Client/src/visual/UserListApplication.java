@@ -1,5 +1,8 @@
 package visual;
 
+import connection.ChatConnection;
+import connection.ChatServer;
+import connection.FixedChatConnection;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -70,8 +73,20 @@ public class UserListApplication extends Application {
             try {
                 final List<User> usersList = Protocol.readResult(socket.getInputStream());
                 Platform.runLater(() -> {
-                    ObservableList<User> items = FXCollections.observableArrayList(usersList.stream().collect(Collectors.toList()));
+                    ObservableList<User> items = FXCollections.observableArrayList(usersList);
                     usersListView.setItems(items);
+                    usersListView.setOnMouseClicked(event -> {
+                        if (event.getClickCount() == 2){
+                            User user = (User) usersListView.getSelectionModel().getSelectedItem();
+                            Stage chatStage = new Stage();
+                            try {
+                                ChatApplication chatApplication = new ChatApplication(new ChatConnection(user.getLastIp(), ChatServer.PORT));
+                                chatApplication.start(chatStage);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 });
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
