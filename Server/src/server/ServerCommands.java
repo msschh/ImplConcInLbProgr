@@ -48,7 +48,7 @@ public class ServerCommands {
     }
 
     @Command
-    private void loginUser(Socket socket, String username, String password) throws IOException {
+    private void loginUser(Socket socket, String username, String password, String lastIp) throws IOException {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 
@@ -69,6 +69,11 @@ public class ServerCommands {
                     if (match) {
                         Integer result = res.getInt("id");
                         Protocol.sendResult(socket.getOutputStream(), result);
+                        
+                        sql = "UPDATE users SET last_ip = ? WHERE id = ?";
+                        try (PreparedStatement updateStatement = this.connection.prepareStatement(sql)) {
+                            
+                        }
                     }
                 }
             }
@@ -126,7 +131,7 @@ public class ServerCommands {
                     User user = new User();
                     user.setUsername(res.getString("username"));
                     user.setId(res.getInt("id"));
-                    user.setIp(res.getString("ip"));
+                    user.setLastIp(res.getString("ip"));
                     oos.writeUnshared(user);
                 }
             }
@@ -163,6 +168,6 @@ public class ServerCommands {
             }
         };
         ServerCommands sc = new ServerCommands();
-        sc.loginUser(testSocket, "test", "test");
+        sc.loginUser(testSocket, "test", "test", "localhost");
     }
 }

@@ -6,7 +6,7 @@ public class User implements Serializable {
 
     private int id;
     private String username;
-    private String ip;
+    private String lastIp;
 
     public User() {
     }
@@ -15,15 +15,15 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public User(String username, String ip) {
-        this.username = username;
-        this.ip = ip;
-    }
-
-    public User(int id, String username, String ip) {
+    public User(int id, String username, String lastIp) {
         this.id = id;
         this.username = username;
-        this.ip = ip;
+        this.lastIp = lastIp;
+    }
+
+    public User(String username, String lastIp) {
+        this.username = username;
+        this.lastIp = lastIp;
     }
 
     public int getId() {
@@ -42,12 +42,12 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public String getIp() {
-        return ip;
+    public String getLastIp() {
+        return lastIp;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setLastIp(String lastIp) {
+        this.lastIp = lastIp;
     }
 
     @Override

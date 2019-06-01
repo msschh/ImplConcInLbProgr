@@ -34,6 +34,7 @@ public class DaoUser {
                     user = new User();
                     user.setId(Integer.parseInt(res.getString("id")));
                     user.setUsername(res.getString("username"));
+                    user.setLastIp(res.getString("last_ip"));
                     userList.add(user);
                 }
             }
