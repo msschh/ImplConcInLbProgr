@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 
 public class UserListApplication extends Application {
@@ -54,11 +55,41 @@ public class UserListApplication extends Application {
         userListStage.setTitle("List of users");
         userListStage.setScene(new Scene(root, 800, 500));
 
-        userListStage.setOnShown(event -> {
-            populateUserListView("");
-        });
+        usersListView.setOnMouseClicked(this::userClicked);
+
+        userListStage.setOnShown(this::windowShown);
 
         userListStage.show();
+    }
+
+    private void windowShown(WindowEvent event) {
+        populateUserListView("");
+
+        ChatServer chatServer = new ChatServer(ChatServer.PORT);
+        chatServer.setConnectionListener(connextion -> { // in caz de conexiune. Aici poti sa deshizi un dialog in care retii connextion si cand apesi pe send apelezi sendMessage
+            Platform.runLater(() -> {
+                try {
+                    ChatApplication chatApplication = new ChatApplication(connextion);
+                    chatApplication.start(new Stage());
+                } catch (Exception ex) {
+                    Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+        });
+        new Thread(chatServer).start();// Devii disponibil ca server.
+    }
+
+    private void userClicked(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            User user = (User) usersListView.getSelectionModel().getSelectedItem();
+            Stage chatStage = new Stage();
+            try {
+                ChatApplication chatApplication = new ChatApplication(new ChatConnection(user.getLastIp(), ChatServer.PORT));
+                chatApplication.start(chatStage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -75,18 +106,6 @@ public class UserListApplication extends Application {
                 Platform.runLater(() -> {
                     ObservableList<User> items = FXCollections.observableArrayList(usersList);
                     usersListView.setItems(items);
-                    usersListView.setOnMouseClicked(event -> {
-                        if (event.getClickCount() == 2){
-                            User user = (User) usersListView.getSelectionModel().getSelectedItem();
-                            Stage chatStage = new Stage();
-                            try {
-                                ChatApplication chatApplication = new ChatApplication(new ChatConnection(user.getLastIp(), ChatServer.PORT));
-                                chatApplication.start(chatStage);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
                 });
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
