@@ -1,12 +1,7 @@
 package visual;
 
-import application.Main;
-import connection.ChatConnection;
-import connection.ChatServer;
-import connection.FixedChatConnection;
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +22,7 @@ import javax.swing.JOptionPane;
 
 import networking.CommandClient;
 import networking.Protocol;
+import utilities.Utilities;
 
 public class LoginApplication extends Application {
 
@@ -63,7 +59,7 @@ public class LoginApplication extends Application {
         String u = this.username.getText();
         String p = this.password.getText();
 
-        Object[] parameters = new Object[]{u, p};
+        Object[] parameters = new Object[]{u, p, Utilities.findIp()};
         this.client.call("loginUser", parameters, true, socket -> {
             try {
                 // stored if we will need in the future

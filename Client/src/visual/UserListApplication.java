@@ -70,7 +70,7 @@ public class UserListApplication extends Application {
             try {
                 final List<User> usersList = Protocol.readResult(socket.getInputStream());
                 Platform.runLater(() -> {
-                    ObservableList<String> items = FXCollections.observableArrayList(usersList.stream().map(User::getUsername).collect(Collectors.toList()));
+                    ObservableList<User> items = FXCollections.observableArrayList(usersList.stream().collect(Collectors.toList()));
                     usersListView.setItems(items);
                 });
             } catch (ClassNotFoundException ex) {

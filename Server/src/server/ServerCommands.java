@@ -72,7 +72,10 @@ public class ServerCommands {
                         
                         sql = "UPDATE users SET last_ip = ? WHERE id = ?";
                         try (PreparedStatement updateStatement = this.connection.prepareStatement(sql)) {
+                            updateStatement.setString(1, lastIp);
+                            updateStatement.setInt(2, result);
                             
+                            updateStatement.executeUpdate();
                         }
                     }
                 }

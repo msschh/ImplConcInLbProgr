@@ -1,45 +1,22 @@
 package utilities;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.TreeMap;
+import application.Main;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Application;
 
 public class Utilities {
 
-    private static final TreeMap<String, Application> retrivers = new TreeMap<>();
-
-    public static void beRetrieved(Application application) {
-        List<String> params = application.getParameters().getRaw();
-        synchronized (Utilities.retrivers) {
-            Utilities.retrivers.put(params.get(0), application);
-        }
-    }
-
-    public static <A extends Application> A appRetriver(Class<A> cls) {
-        try {
-            Method main = cls.getDeclaredMethod("main", String[].class);
-            main.setAccessible(true);
-            String token = cls.getName() + System.nanoTime();
-            main.invoke(null, (Object) new String[]{token});
-
-            while (true) {
-                Thread.sleep(100);
-
-                synchronized (Utilities.retrivers) {
-                    Application app = Utilities.retrivers.get(token);
-                    if (app != null) {
-                        return (A) app;
-                    }
-                }
-            }
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InterruptedException ex) {
+    public static String findIp() {
+        try (final DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            return socket.getLocalAddress().getHostAddress();
+        } catch (SocketException | UnknownHostException ex) {
             Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         return null;
     }
 }
