@@ -42,6 +42,7 @@ public class FixedChatConnection implements Runnable {
             this.outputStream.write(0);
             return true;
         } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         return false;

@@ -1,44 +1,29 @@
 package application;
 
-import connection.ChatConnection;
 import connection.ChatServer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.stage.Stage;
+import visual.ChatApplication;
+import visual.LoginApplication;
 
 public class Main {
 
     public static void main(String[] args) {
-//        LoginApplication.main(args);
-
-        ChatServer chatServer = new ChatServer(4321);
+        ChatServer chatServer = new ChatServer(ChatServer.PORT);
         chatServer.setConnectionListener(connextion -> { // in caz de conexiune. Aici poti sa deshizi un dialog in care retii connextion si cand apesi pe send apelezi sendMessage
-            connextion.setMessageListener(message -> {
-                connextion.sendMessage("You said: " + message);
+            Platform.runLater(() -> {
+                try {
+                    ChatApplication chatApplication = new ChatApplication(connextion);
+                    chatApplication.start(new Stage());
+                } catch (Exception ex) {
+                    Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
-            
-            connextion.sendMessage("Hello there");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            connextion.sendMessage("How are you?");
         });
         new Thread(chatServer).start();// Devii disponibil ca server.
-
-        ChatConnection cc = new ChatConnection("localhost", 4321);
-        cc.setMessageListener(message -> {
-            System.out.println("Recieved: " + message);
-        });
         
-        new Thread(cc).start();// Te re/conectezi in acest thread.
-        
-        while (!cc.sendMessage("Hello?")) { // daca sendMessage e false ii zici ca nu a fost trimis mesajul
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        LoginApplication.main(args);
     }
 }

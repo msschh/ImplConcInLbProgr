@@ -1,11 +1,17 @@
 package visual;
 
+import application.Main;
+import connection.ChatConnection;
+import connection.ChatServer;
+import connection.FixedChatConnection;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +49,7 @@ public class LoginApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        URL resource = getClass().getResource("/visual/FXML.fxml");
+        URL resource = getClass().getResource("/visual/LoginFxml.fxml");
         FXMLLoader loader = new FXMLLoader(resource);
         Parent root = loader.load();
         primaryStage.setTitle("Registration Form FXML Application");
@@ -70,6 +76,17 @@ public class LoginApplication extends Application {
 
     @FXML
     private void createAccount(ActionEvent event) {
+        try {
+            Stage secondStage = new Stage();
+            ChatConnection cc = new ChatConnection("192.168.0.254", ChatServer.PORT);
+            ChatApplication chatApplication = new ChatApplication(cc);
+            chatApplication.start(secondStage);
+            
+            new Thread(cc).start();
+        } catch (Exception ex) {
+            Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         String u = this.createUsername.getText();
         String p = this.createPassword.getText();
         String rp = this.createRePassword.getText();
@@ -85,17 +102,20 @@ public class LoginApplication extends Application {
             try {
                 int success = socket.getInputStream().read();
                 if (success == 1) {
-                    
+
                 } else if (success == 0) {
-                    Alert alert = new Alert(AlertType.ERROR, "Existent username!", ButtonType.OK);
-                    alert.showAndWait();
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(AlertType.ERROR, "Existent username!", ButtonType.OK);
+                        alert.showAndWait();
+                    });
                 }
                 return;
             } catch (IOException ioe) {
             }
-
-            Alert alert = new Alert(AlertType.ERROR, "Server related error!", ButtonType.OK);
-            alert.showAndWait();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(AlertType.ERROR, "Server related error!", ButtonType.OK);
+                alert.showAndWait();
+            });
         });
     }
 

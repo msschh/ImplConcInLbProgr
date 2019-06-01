@@ -6,6 +6,8 @@ import java.net.Socket;
 
 public class ChatServer implements Runnable {
 
+    public static final int PORT = 5823;
+    
     protected boolean running;
     protected ServerSocket serverSocket;
     protected final int port;
