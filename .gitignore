@@ -1,10 +1,16 @@
 
+.idea/
 Library/build/
 Library/dist/
 Library/nbproject/
+Library/Library.iml
 Server/build/
 Server/nbproject/
 Server/dist/
+Server/.idea/
+Server/Server.iml
 /Client/nbproject/private/
 /Client/build/
 /Client/dist/
+Client/.idea/
+Client/Client.iml
