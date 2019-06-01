@@ -89,17 +89,6 @@ public class LoginApplication extends Application {
 
     @FXML
     private void createAccount(ActionEvent event) {
-        try {
-            Stage secondStage = new Stage();
-            ChatConnection cc = new ChatConnection("192.168.0.254", ChatServer.PORT);
-            ChatApplication chatApplication = new ChatApplication(cc);
-            chatApplication.start(secondStage);
-            
-            new Thread(cc).start();
-        } catch (Exception ex) {
-            Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
         String u = this.createUsername.getText();
         String p = this.createPassword.getText();
         String rp = this.createRePassword.getText();

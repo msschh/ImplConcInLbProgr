@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.stage.WindowEvent;
 
 public class UserListApplication extends Application {
 
@@ -33,22 +36,26 @@ public class UserListApplication extends Application {
 
     private final CommandClient client = new CommandClient("localhost", Protocol.PORT);
 
-
     @Override
     public void init() throws Exception {
         super.init();
+
     }
 
     @Override
     public void start(Stage userListStage) throws Exception {
         URL resource = getClass().getResource("/visual/UserListFXML.fxml");
         FXMLLoader loader = new FXMLLoader(resource);
+        loader.setController(this);
         Parent root = loader.load();
         userListStage.setTitle("List of users");
         userListStage.setScene(new Scene(root, 800, 500));
+
+        userListStage.setOnShown(event -> {
+            populateUserListView("");
+        });
+
         userListStage.show();
-        usersListView = new ListView<String>();
-        populateUserListView("");
     }
 
     @FXML
@@ -59,11 +66,13 @@ public class UserListApplication extends Application {
 
     private void populateUserListView(String username) {
         Object[] parameters = new Object[]{username};
-        this.client.call("getUsers", parameters, true, socket -> {
+        this.client.call("getUsers", parameters, socket -> {
             try {
-                List<User> usersList = Protocol.readResult(socket.getInputStream());
-                ObservableList<String> items = FXCollections.observableArrayList(usersList.stream().map(User::getUsername).collect(Collectors.toList()));
-                usersListView.setItems(items);
+                final List<User> usersList = Protocol.readResult(socket.getInputStream());
+                Platform.runLater(() -> {
+                    ObservableList<String> items = FXCollections.observableArrayList(usersList.stream().map(User::getUsername).collect(Collectors.toList()));
+                    usersListView.setItems(items);
+                });
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
             }
