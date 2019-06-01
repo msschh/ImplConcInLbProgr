@@ -18,6 +18,8 @@ import java.util.Base64;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import dao.DaoUser;
 import model.User;
 import networking.Command;
 import networking.Protocol;
@@ -32,7 +34,7 @@ public class ServerCommands {
 
     public ServerCommands() {
         try {
-            this.connection = DriverManager.getConnection(DB_URL, "root", "");
+            this.connection = DriverManager.getConnection(DB_URL, "root", "root");
         } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -131,6 +133,11 @@ public class ServerCommands {
         } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Command
+    private void getUsers(Socket socket, String username) throws IOException {
+        Protocol.sendResult(socket.getOutputStream(), DaoUser.readUsers(connection, username));
     }
 
     public static void main(String[] args) throws IOException {

@@ -18,6 +18,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+
 import networking.CommandClient;
 import networking.Protocol;
 
@@ -57,9 +58,21 @@ public class LoginApplication extends Application {
         String p = this.password.getText();
 
         Object[] parameters = new Object[]{u, p};
-        this.client.call("loginUser", parameters, socket -> {
+        this.client.call("loginUser", parameters, true, socket -> {
             try {
-                JOptionPane.showMessageDialog(null, Protocol.readResult(socket.getInputStream()));
+                // stored if we will need in the future
+                Integer loggedUserId = Protocol.readResult(socket.getInputStream());
+                try {
+                    Stage secondStage = new Stage();
+                    UserListApplication userListApplication = new UserListApplication();
+                    userListApplication.start(secondStage);
+
+                    //close the primary scene
+                    Stage stage = (Stage) username.getScene().getWindow();
+                    stage.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
             } catch (EOFException e) {
