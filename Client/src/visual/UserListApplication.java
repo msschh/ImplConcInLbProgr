@@ -84,7 +84,7 @@ public class UserListApplication extends Application {
             User user = (User) usersListView.getSelectionModel().getSelectedItem();
             Stage chatStage = new Stage();
             try {
-                ChatConnection chatConnection = new ChatConnection(user.getLastIp(), ChatServer.PORT);
+                ChatConnection chatConnection = new ChatConnection(user, user.getLastIp(), ChatServer.PORT);
                 ChatApplication chatApplication = new ChatApplication(chatConnection);
                 chatApplication.start(chatStage);
                 new Thread(chatConnection).start();

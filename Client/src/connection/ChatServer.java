@@ -3,6 +3,8 @@ package connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import model.User;
+import networking.Protocol;
 
 public class ChatServer implements Runnable {
 
@@ -42,13 +44,14 @@ public class ChatServer implements Runnable {
             this.serverSocket = new ServerSocket(this.port);
             try (ServerSocket ss = this.serverSocket) {
                 Socket s = ss.accept();
-                FixedChatConnection fcc = new FixedChatConnection(s);
+                User user = Protocol.readResult(s.getInputStream());
+                FixedChatConnection fcc = new FixedChatConnection(s, user);
                 new Thread(fcc).start();
                 if (this.connectionListener != null) {
                     this.connectionListener.onConnection(fcc);
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
         }
     }
 

@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import model.User;
 
 public class ChatApplication extends Application {
 
@@ -42,7 +43,7 @@ public class ChatApplication extends Application {
         FXMLLoader loader = new FXMLLoader(resource);
         loader.setController(this);
         Parent root = loader.load();
-        primaryStage.setTitle("Chat");
+        primaryStage.setTitle("Chat: " + this.chatConnection.getUser());
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
 

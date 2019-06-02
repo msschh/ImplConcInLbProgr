@@ -4,20 +4,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import model.User;
 
 public class FixedChatConnection implements Runnable {
 
-    private final Socket socket;
+    protected Socket socket;
+    protected final User user;
     protected boolean running;
     protected OutputStream outputStream;
     protected ChatMessageListener messageListener;
 
-    public FixedChatConnection() {
-        this.socket = null;
+    public FixedChatConnection(User user) {
+        this.user = user;
     }
 
-    public FixedChatConnection(Socket socket) {
+    public FixedChatConnection(Socket socket, User user) {
+        this(user);
         this.socket = socket;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public ChatMessageListener getMessageListener() {
