@@ -52,6 +52,14 @@ public class LoginApplication extends Application {
         Parent root = loader.load();
         primaryStage.setTitle("Registration Form FXML Application");
         primaryStage.setScene(new Scene(root, 800, 500));
+
+        // cand este apasat butonul de inchidere, atunci este inchisa intreaga aplicatie, nu doar
+        // fereastra de chat
+        primaryStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
         primaryStage.show();
     }
 
