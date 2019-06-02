@@ -50,7 +50,7 @@ public class LoginApplication extends Application {
         URL resource = getClass().getResource("/visual/LoginFxml.fxml");
         FXMLLoader loader = new FXMLLoader(resource);
         Parent root = loader.load();
-        primaryStage.setTitle("Registration Form FXML Application");
+        primaryStage.setTitle("Chat App");
         primaryStage.setScene(new Scene(root, 800, 500));
 
         // cand este apasat butonul de inchidere, atunci este inchisa intreaga aplicatie, nu doar
