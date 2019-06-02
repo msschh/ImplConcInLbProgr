@@ -77,8 +77,8 @@ COMMIT;
 -- Table messages
 CREATE TABLE `messages` (
   `id` int(11) NOT NULL,
-  `id_from` varchar(255) NOT NULL,
-  `id_to` varchar(255) NOT NULL,
+  `id_from` int(11) NOT NULL,
+  `id_to` int(11) NOT NULL,
   `message` text NOT NULL,
   `date` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
