@@ -34,7 +34,7 @@ public class ServerCommands {
 
     public ServerCommands() {
         try {
-            this.connection = DriverManager.getConnection(DB_URL, "root", "root");
+            this.connection = DriverManager.getConnection(DB_URL, "root", "");
         } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -146,6 +146,11 @@ public class ServerCommands {
     @Command
     private void getUsers(Socket socket, String username) throws IOException {
         Protocol.sendResult(socket.getOutputStream(), DaoUser.readUsers(connection, username));
+    }
+
+    @Command
+    private void getMessages(Socket socket, Integer id_from, Integer id_to) throws IOException {
+        Protocol.sendResult(socket.getOutputStream(), DaoUser.readMessages(connection, id_from, id_to));
     }
 
     public static void main(String[] args) throws IOException {
