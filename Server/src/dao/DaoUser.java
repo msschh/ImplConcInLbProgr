@@ -51,19 +51,19 @@ public class DaoUser {
             return null;
         }
         List<Message> messageList = new ArrayList<>();
-        String sql = "SELECT * FROM MESSAGES WHERE (id_to = ? AND id_from = ?) OR (id_to = ? AND id_from = ?) ORDER BY date DESC";
+        String sql = "SELECT * FROM MESSAGES WHERE (id_to = ? OR id_from = ?) OR (id_to = ? AND id_from = ?) ORDER BY date DESC";
         try (PreparedStatement prepareStatement = con.prepareStatement(sql)) {
-            prepareStatement.setString(1, id_from.toString());
-            prepareStatement.setString(2, id_to.toString());
-            prepareStatement.setString(3, id_to.toString());
-            prepareStatement.setString(4, id_from.toString());
+            prepareStatement.setInt(1, id_from);
+            prepareStatement.setInt(2, id_to);
+            prepareStatement.setInt(3, id_to);
+            prepareStatement.setInt(4, id_from);
             try (ResultSet res = prepareStatement.executeQuery()) {
                 Message message;
                 while (res.next()) {
                     message = new Message();
-                    message.setId(Integer.parseInt(res.getString("id")));
-                    message.setIdFrom(Integer.parseInt(res.getString("id_from")));
-                    message.setIdTo(Integer.parseInt(res.getString("id_to")));
+                    message.setId(res.getInt("id"));
+                    message.setIdFrom(res.getInt("id_from"));
+                    message.setIdTo(res.getInt("id_to"));
                     message.setMessage(res.getString("message"));
                     message.setDate(res.getDate("date"));
                     messageList.add(message);

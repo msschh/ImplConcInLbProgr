@@ -78,7 +78,7 @@ public class UserListApplication extends Application {
         chatServer.setConnectionListener(connextion -> { // in caz de conexiune. Aici poti sa deshizi un dialog in care retii connextion si cand apesi pe send apelezi sendMessage
             Platform.runLater(() -> {
                 try {
-                    ChatApplication chatApplication = new ChatApplication(connextion);
+                    ChatApplication chatApplication = new ChatApplication(this.client, connextion);
                     chatApplication.start(new Stage());
                 } catch (Exception ex) {
                     Logger.getLogger(LoginApplication.class.getName()).log(Level.SEVERE, null, ex);
@@ -94,7 +94,7 @@ public class UserListApplication extends Application {
             Stage chatStage = new Stage();
             try {
                 ChatConnection chatConnection = new ChatConnection(this.user, other, other.getLastIp(), ChatServer.PORT);
-                ChatApplication chatApplication = new ChatApplication(chatConnection);
+                ChatApplication chatApplication = new ChatApplication(this.client, chatConnection);
                 chatApplication.start(chatStage);
                 new Thread(chatConnection).start();
             } catch (Exception e) {

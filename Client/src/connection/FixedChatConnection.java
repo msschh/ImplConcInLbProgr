@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import model.User;
+import utilities.SimpleListener;
 
 public class FixedChatConnection implements Runnable {
 
@@ -14,6 +15,7 @@ public class FixedChatConnection implements Runnable {
     protected boolean running;
     protected OutputStream outputStream;
     protected ChatMessageListener messageListener;
+    protected SimpleListener<Void> connectionLostListener;
 
     public FixedChatConnection(User you, User other) {
         this.you = you;
@@ -45,6 +47,14 @@ public class FixedChatConnection implements Runnable {
         this.messageListener = messageListener;
     }
 
+    public SimpleListener<Void> getConnectionLostListener() {
+        return connectionLostListener;
+    }
+
+    public void setConnectionLostListener(SimpleListener<Void> connectionLostListener) {
+        this.connectionLostListener = connectionLostListener;
+    }
+    
     public void stop() {
         this.running = false;
     }
@@ -92,6 +102,8 @@ public class FixedChatConnection implements Runnable {
             }
         } catch (IOException ex) {
         }
+        
+        this.connectionLostListener.execute(null);
     }
 
 }

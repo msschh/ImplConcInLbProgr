@@ -7,6 +7,7 @@ package visual;
 
 import connection.FixedChatConnection;
 import java.net.URL;
+import java.util.List;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,9 +17,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import model.User;
+import networking.CommandClient;
+import networking.Protocol;
 
 public class ChatApplication extends Application {
 
@@ -31,8 +32,15 @@ public class ChatApplication extends Application {
     @FXML
     private Button send;
 
-    public ChatApplication(FixedChatConnection chatConnection) {
+    private final CommandClient client;
+
+    public ChatApplication(CommandClient client, FixedChatConnection chatConnection) {
+        this.client = client;
         this.chatConnection = chatConnection;
+    }
+
+    public CommandClient getClient() {
+        return client;
     }
 
     public FixedChatConnection getChatConnection() {
@@ -49,15 +57,24 @@ public class ChatApplication extends Application {
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
         primaryStage.setOnShown(this::wondowShown);
-        
+
         this.chatConnection.setMessageListener(message -> {
             this.messages.appendText(message);
             this.messages.appendText("\n");
         });
     }
-    
+
     private void wondowShown(WindowEvent event) {
-        
+        Object[] params = new Object[]{};
+        this.client.call("getMessages", params, s -> {
+            try {
+                List<String> msgs = Protocol.readResult(s.getInputStream());
+                for (String msg : msgs) {
+                    this.chatConnection.getMessageListener().onMessage(msg);
+                }
+            } catch (ClassNotFoundException e) {
+            }
+        });
     }
 
     @Override
