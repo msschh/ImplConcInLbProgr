@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dao.DaoUser;
+import model.Message;
 import model.User;
 import networking.Command;
 import networking.Protocol;
@@ -151,6 +152,11 @@ public class ServerCommands {
     @Command
     private void getMessages(Socket socket, Integer id_from, Integer id_to) throws IOException {
         Protocol.sendResult(socket.getOutputStream(), DaoUser.readMessages(connection, id_from, id_to));
+    }
+
+    @Command
+    private void writeMessage(Socket socket, Message message) throws IOException {
+        DaoUser.writeMessage(connection, message);
     }
 
     public static void main(String[] args) throws IOException {
