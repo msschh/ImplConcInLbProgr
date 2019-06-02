@@ -34,7 +34,7 @@ public class ServerCommands {
 
     public ServerCommands() {
         try {
-            this.connection = DriverManager.getConnection(DB_URL, "root", "");
+            this.connection = DriverManager.getConnection(DB_URL, "root", "root");
         } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
