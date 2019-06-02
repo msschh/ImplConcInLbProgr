@@ -59,6 +59,7 @@ public class LoginApplication extends Application {
             Platform.exit();
             System.exit(0);
         });
+        
 
         primaryStage.show();
     }
