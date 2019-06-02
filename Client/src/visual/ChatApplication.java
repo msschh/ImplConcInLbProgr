@@ -16,6 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import model.User;
 
 public class ChatApplication extends Application {
@@ -43,14 +45,19 @@ public class ChatApplication extends Application {
         FXMLLoader loader = new FXMLLoader(resource);
         loader.setController(this);
         Parent root = loader.load();
-        primaryStage.setTitle("Chat: " + this.chatConnection.getUser());
+        primaryStage.setTitle("Chat: " + this.chatConnection.getYou());
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
-
+        primaryStage.setOnShown(this::wondowShown);
+        
         this.chatConnection.setMessageListener(message -> {
             this.messages.appendText(message);
             this.messages.appendText("\n");
         });
+    }
+    
+    private void wondowShown(WindowEvent event) {
+        
     }
 
     @Override

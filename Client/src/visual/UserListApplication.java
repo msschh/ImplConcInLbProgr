@@ -39,6 +39,15 @@ public class UserListApplication extends Application {
     private Button usernameSearchButton;
 
     private final CommandClient client = new CommandClient("localhost", Protocol.PORT);
+    private final User user;
+
+    public UserListApplication(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
 
     @Override
     public void init() throws Exception {
@@ -65,7 +74,7 @@ public class UserListApplication extends Application {
     private void windowShown(WindowEvent event) {
         populateUserListView("");
 
-        ChatServer chatServer = new ChatServer(ChatServer.PORT);
+        ChatServer chatServer = new ChatServer(this.user, ChatServer.PORT);
         chatServer.setConnectionListener(connextion -> { // in caz de conexiune. Aici poti sa deshizi un dialog in care retii connextion si cand apesi pe send apelezi sendMessage
             Platform.runLater(() -> {
                 try {
@@ -81,10 +90,10 @@ public class UserListApplication extends Application {
 
     private void userClicked(MouseEvent event) {
         if (event.getClickCount() == 2) {
-            User user = (User) usersListView.getSelectionModel().getSelectedItem();
+            User other = (User) usersListView.getSelectionModel().getSelectedItem();
             Stage chatStage = new Stage();
             try {
-                ChatConnection chatConnection = new ChatConnection(user, user.getLastIp(), ChatServer.PORT);
+                ChatConnection chatConnection = new ChatConnection(this.user, other, other.getLastIp(), ChatServer.PORT);
                 ChatApplication chatApplication = new ChatApplication(chatConnection);
                 chatApplication.start(chatStage);
                 new Thread(chatConnection).start();
