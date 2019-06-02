@@ -4,10 +4,7 @@ import model.Message;
 import model.User;
 import server.ServerCommands;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -16,7 +13,15 @@ import java.util.logging.Logger;
 
 public class DaoUser {
 
-    public static List<User> readUsers(Connection con, String username) {
+    DBOperations dbOperations;
+    Connection con;
+
+    public DaoUser(Connection con, DBOperations dbOperations) {
+        this.con = con;
+        this.dbOperations = dbOperations;
+    }
+
+    public List<User> readUsers(String username) {
         if (con == null) {
             return null;
         }
@@ -48,51 +53,29 @@ public class DaoUser {
         return userList;
     }
 
-    public static List<Message> readMessages(Connection con, Integer id_from, Integer id_to) {
-        if (con == null || id_from == null || id_to == null) {
-            return null;
+    public User searchUser(String query) {
+        String sql = "SELECT id, username, ip FROM users WHERE username LIKE ?";
+        if (query == null) {
+            query = "%%";
+        } else {
+            query = '%' + query + '%';
         }
-        List<Message> messageList = new ArrayList<>();
-        String sql = "SELECT * FROM MESSAGES WHERE (id_to = ? OR id_from = ?) OR (id_to = ? AND id_from = ?) ORDER BY date DESC";
-        try (PreparedStatement prepareStatement = con.prepareStatement(sql)) {
-            prepareStatement.setInt(1, id_from);
-            prepareStatement.setInt(2, id_to);
-            prepareStatement.setInt(3, id_to);
-            prepareStatement.setInt(4, id_from);
-            try (ResultSet res = prepareStatement.executeQuery()) {
-                Message message;
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setString(1, query);
+
+            try (ResultSet res = statement.executeQuery()) {
                 while (res.next()) {
-                    message = new Message();
-                    message.setId(res.getInt("id"));
-                    message.setIdFrom(res.getInt("id_from"));
-                    message.setIdTo(res.getInt("id_to"));
-                    message.setMessage(res.getString("message"));
-                    message.setDate(res.getDate("date"));
-                    messageList.add(message);
+                    User user = new User();
+                    user.setUsername(res.getString("username"));
+                    user.setId(res.getInt("id"));
+                    user.setLastIp(res.getString("ip"));
+                    return user;
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(DaoUser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return messageList;
-    }
-
-    public static void writeMessage(Connection con, Message message) {
-        if (message == null) {
-            return;
-        }
-        String sql = "INSERT INTO messages(`id_from`, `id_to`, `message`, `date`) values (?, ?, ?, ?)";
-        try (PreparedStatement prepareStatement = con.prepareStatement(sql)) {
-            prepareStatement.setInt(1, message.getIdFrom());
-            prepareStatement.setInt(2, message.getIdTo());
-            prepareStatement.setString(3, message.getMessage());
-            Calendar currenttime = Calendar.getInstance();
-            prepareStatement.setDate(4, new Date((currenttime.getTime()).getTime()));
-
-            prepareStatement.executeUpdate();
-        } catch (Exception ex) {
-            Logger.getLogger(DaoUser.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        return null;
     }
 }

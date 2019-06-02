@@ -19,9 +19,10 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import dao.DBOperations;
+import dao.DaoMessage;
 import dao.DaoUser;
 import model.Message;
-import model.User;
 import networking.Command;
 import networking.Protocol;
 
@@ -32,10 +33,16 @@ public class ServerCommands {
     private static final String DB_URL = "jdbc:mysql://localhost/chat" + ServerCommands.URL_PARAMS;
     private final Random random = new Random();
     private Connection connection;
+    private DaoUser daoUser;
+    private DaoMessage daoMessage;
+    private DBOperations dbOperations;
 
     public ServerCommands() {
         try {
-            this.connection = DriverManager.getConnection(DB_URL, "root", "xampprootpass");
+            this.connection = DriverManager.getConnection(DB_URL, "root", "root");
+            dbOperations = new DBOperations();
+            daoUser = new DaoUser(connection, dbOperations);
+            daoMessage = new DaoMessage(connection, dbOperations);
         } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -120,44 +127,23 @@ public class ServerCommands {
 
     @Command
     private void searchUser(Socket socket, String query) throws IOException {
-        String sql = "SELECT id, username, ip FROM users WHERE username LIKE ?";
-        if (query == null) {
-            query = "%%";
-        } else {
-            query = '%' + query + '%';
-        }
-
-        try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-            statement.setString(1, query);
-
-            try (ResultSet res = statement.executeQuery()) {
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                while (res.next()) {
-                    User user = new User();
-                    user.setUsername(res.getString("username"));
-                    user.setId(res.getInt("id"));
-                    user.setLastIp(res.getString("ip"));
-                    oos.writeUnshared(user);
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+        oos.writeUnshared(daoUser.searchUser(query));
     }
 
     @Command
     private void getUsers(Socket socket, String username) throws IOException {
-        Protocol.sendResult(socket.getOutputStream(), DaoUser.readUsers(connection, username));
+        Protocol.sendResult(socket.getOutputStream(), daoUser.readUsers(username));
     }
 
     @Command
     private void getMessages(Socket socket, Integer id_from, Integer id_to) throws IOException {
-        Protocol.sendResult(socket.getOutputStream(), DaoUser.readMessages(connection, id_from, id_to));
+        Protocol.sendResult(socket.getOutputStream(), daoMessage.readMessages(id_from, id_to));
     }
 
     @Command
     private void writeMessage(Socket socket, Message message) throws IOException {
-        DaoUser.writeMessage(connection, message);
+        daoMessage.writeMessage(message);
     }
 
     public static void main(String[] args) throws IOException {
