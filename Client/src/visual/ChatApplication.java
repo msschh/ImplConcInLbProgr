@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import model.Message;
 import networking.CommandClient;
 import networking.Protocol;
 
@@ -53,7 +54,7 @@ public class ChatApplication extends Application {
         FXMLLoader loader = new FXMLLoader(resource);
         loader.setController(this);
         Parent root = loader.load();
-        primaryStage.setTitle("Chat: " + this.chatConnection.getYou());
+        primaryStage.setTitle("Chat: " + this.chatConnection.getOther());
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
         primaryStage.setOnShown(this::wondowShown);
@@ -65,12 +66,12 @@ public class ChatApplication extends Application {
     }
 
     private void wondowShown(WindowEvent event) {
-        Object[] params = new Object[]{};
+        Object[] params = new Object[]{this.chatConnection.getYou().getId(), this.chatConnection.getOther().getId()};
         this.client.call("getMessages", params, s -> {
             try {
-                List<String> msgs = Protocol.readResult(s.getInputStream());
-                for (String msg : msgs) {
-                    this.chatConnection.getMessageListener().onMessage(msg);
+                List<Message> msgs = Protocol.readResult(s.getInputStream());
+                for (Message msg : msgs) {
+                    this.chatConnection.getMessageListener().onMessage(msg.getMessage());
                 }
             } catch (ClassNotFoundException e) {
             }
@@ -89,5 +90,8 @@ public class ChatApplication extends Application {
         this.message.setText("");
         this.chatConnection.sendMessage(message);
         this.chatConnection.getMessageListener().onMessage(message);
+
+        Object[] params = new Object[]{this.chatConnection.getYou().getId(), this.chatConnection.getOther().getId(), message};
+        this.client.call("writeMessage", params, false);
     }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 01, 2019 at 05:36 PM
+-- Generation Time: Jun 02, 2019 at 01:50 PM
 -- Server version: 10.1.40-MariaDB
 -- PHP Version: 7.3.5
 
@@ -21,6 +21,20 @@ SET time_zone = "+00:00";
 --
 -- Database: `chat`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL,
+  `id_from` int(11) NOT NULL,
+  `id_to` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -45,11 +59,19 @@ INSERT INTO `users` (`id`, `username`, `password`, `salt`, `last_ip`) VALUES
 (2, 'merge', 0x4ffce4120ad9845b63e89dd740eb6a0c998a3f7f06a016a8d676f95ba664a999, 'gtAVN2kh3Azas68gr46O', NULL),
 (3, 'merge2', 0x6807aeeec962417c546c64b26a0d1e433c0aba01aaec1630f437f5cc4ebaefb0, 'YIMbbwYBX/WoPBpQdCkg', NULL),
 (6, 'test', 0x1108bc3e4f506bad4746f193708b905bb96739fafe88102b9990ea7aacf59d2e, 'jItN3rFVD3gLpy8Z/Mw2', NULL),
-(20, 'q', 0x542c31a9cf69abb28958e4fc704dcc9834e563de45fe53d22066c68c9da7e562, 'vVwCFRdg33wRy8TvCPi7', NULL);
+(20, 'q', 0x542c31a9cf69abb28958e4fc704dcc9834e563de45fe53d22066c68c9da7e562, 'vVwCFRdg33wRy8TvCPi7', '192.168.0.101');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_from` (`id_from`),
+  ADD KEY `id_to` (`id_to`);
 
 --
 -- Indexes for table `users`
@@ -62,30 +84,29 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `messages`
+--
+ALTER TABLE `messages`
+  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`id_from`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`id_to`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-
--- Table messages
-CREATE TABLE `messages` (
-  `id` int(11) NOT NULL,
-  `id_from` int(11) NOT NULL,
-  `id_to` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `date` DATETIME NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE `messages`
-  ADD PRIMARY KEY (`id`);
-  
- 
-ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
