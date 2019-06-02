@@ -11,14 +11,14 @@ public class ChatConnection extends FixedChatConnection {
     private String ip;
     private int port;
 
-    public ChatConnection(User user, String ip, int port) {
-        super(user);
+    public ChatConnection(User you, User other, String ip, int port) {
+        super(you, other);
         this.ip = ip;
         this.port = port;
     }
 
-    public ChatConnection(User user, String ip, int port, ChatMessageListener messageListener) {
-        this(user, ip, port);
+    public ChatConnection(User you, User other, String ip, int port, ChatMessageListener messageListener) {
+        this(you, other, ip, port);
         this.messageListener = messageListener;
     }
 
@@ -44,7 +44,7 @@ public class ChatConnection extends FixedChatConnection {
         while (this.running) {
             try (Socket socket = new Socket(this.ip, this.port)) {
                 this.outputStream = socket.getOutputStream();
-                Protocol.sendResult(this.outputStream, super.user);
+                Protocol.sendResult(this.outputStream, super.you);
 
                 StringBuilder sb = new StringBuilder();
                 InputStream is = socket.getInputStream();

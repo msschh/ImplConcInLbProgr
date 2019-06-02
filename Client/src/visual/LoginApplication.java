@@ -19,6 +19,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import model.User;
 
 import networking.CommandClient;
 import networking.Protocol;
@@ -58,15 +59,17 @@ public class LoginApplication extends Application {
     private void login(ActionEvent event) {
         String u = this.username.getText();
         String p = this.password.getText();
-
-        Object[] parameters = new Object[]{u, p, Utilities.findIp()};
+        String lastIp = Utilities.findIp();
+        
+        Object[] parameters = new Object[]{u, p, lastIp};
         this.client.call("loginUser", parameters, true, socket -> {
             try {
                 // stored if we will need in the future
                 Integer loggedUserId = Protocol.readResult(socket.getInputStream());
                 try {
+                    User user = new User(loggedUserId, u, lastIp);
                     Stage secondStage = new Stage();
-                    UserListApplication userListApplication = new UserListApplication();
+                    UserListApplication userListApplication = new UserListApplication(user);
                     userListApplication.start(secondStage);
 
                     //close the primary scene

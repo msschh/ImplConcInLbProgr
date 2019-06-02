@@ -9,17 +9,19 @@ import model.User;
 public class FixedChatConnection implements Runnable {
 
     protected Socket socket;
-    protected final User user;
+    protected final User you;
+    protected final User other;
     protected boolean running;
     protected OutputStream outputStream;
     protected ChatMessageListener messageListener;
 
-    public FixedChatConnection(User user) {
-        this.user = user;
+    public FixedChatConnection(User you, User other) {
+        this.you = you;
+        this.other = other;
     }
 
-    public FixedChatConnection(Socket socket, User user) {
-        this(user);
+    public FixedChatConnection(Socket socket, User you, User other) {
+        this(you, other);
         this.socket = socket;
     }
 
@@ -27,8 +29,12 @@ public class FixedChatConnection implements Runnable {
         return socket;
     }
 
-    public User getUser() {
-        return user;
+    public User getYou() {
+        return you;
+    }
+
+    public User getOther() {
+        return other;
     }
 
     public ChatMessageListener getMessageListener() {

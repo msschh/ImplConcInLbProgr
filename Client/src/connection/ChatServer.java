@@ -14,8 +14,10 @@ public class ChatServer implements Runnable {
     protected ServerSocket serverSocket;
     protected final int port;
     protected ChatConnectionListener connectionListener;
+    protected final User user;
 
-    public ChatServer(int port) {
+    public ChatServer(User user, int port) {
+        this.user = user;
         this.port = port;
     }
 
@@ -44,8 +46,8 @@ public class ChatServer implements Runnable {
             this.serverSocket = new ServerSocket(this.port);
             try (ServerSocket ss = this.serverSocket) {
                 Socket s = ss.accept();
-                User user = Protocol.readResult(s.getInputStream());
-                FixedChatConnection fcc = new FixedChatConnection(s, user);
+                User other = Protocol.readResult(s.getInputStream());
+                FixedChatConnection fcc = new FixedChatConnection(s, this.user, other);
                 new Thread(fcc).start();
                 if (this.connectionListener != null) {
                     this.connectionListener.onConnection(fcc);
