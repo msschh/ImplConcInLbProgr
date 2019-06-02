@@ -23,6 +23,7 @@ import model.User;
 
 import networking.CommandClient;
 import networking.Protocol;
+import utilities.InputValidator;
 import utilities.Utilities;
 
 public class LoginApplication extends Application {
@@ -66,17 +67,31 @@ public class LoginApplication extends Application {
 
     @FXML
     private void login(ActionEvent event) {
-        String u = this.username.getText();
-        String p = this.password.getText();
+        String usernameInput = this.username.getText();
+        String passwordInput = this.password.getText();
         String lastIp = Utilities.findIp();
+
+        // valideaza username-ul
+        if (!InputValidator.isUsernameValid(usernameInput)) {
+            Alert usernameInvalidAlert = new Alert(AlertType.ERROR, "The username is invalid.", ButtonType.CLOSE);
+            usernameInvalidAlert.show();
+            return;
+        }
+
+        // valideaza parola
+        if (!InputValidator.isPasswordValid(passwordInput)) {
+            Alert passwordInvalidAlert = new Alert(AlertType.ERROR, "The password is invalid.", ButtonType.CLOSE);
+            passwordInvalidAlert.show();
+            return;
+        }
         
-        Object[] parameters = new Object[]{u, p, lastIp};
+        Object[] parameters = new Object[]{usernameInput, passwordInput, lastIp};
         this.client.call("loginUser", parameters, true, socket -> {
             try {
                 // stored if we will need in the future
                 Integer loggedUserId = Protocol.readResult(socket.getInputStream());
                 try {
-                    User user = new User(loggedUserId, u, lastIp);
+                    User user = new User(loggedUserId, usernameInput, lastIp);
                     Stage secondStage = new Stage();
                     UserListApplication userListApplication = new UserListApplication(user);
                     userListApplication.start(secondStage);
