@@ -112,7 +112,10 @@ public class LoginApplication extends Application {
             try {
                 int success = socket.getInputStream().read();
                 if (success == 1) {
-
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(AlertType.INFORMATION, "User created!", ButtonType.OK);
+                        alert.showAndWait();
+                    });
                 } else if (success == 0) {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(AlertType.ERROR, "Existent username!", ButtonType.OK);

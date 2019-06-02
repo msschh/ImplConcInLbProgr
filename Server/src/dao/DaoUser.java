@@ -5,9 +5,11 @@ import model.User;
 import server.ServerCommands;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,5 +76,23 @@ public class DaoUser {
             Logger.getLogger(DaoUser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return messageList;
+    }
+
+    public static void writeMessage(Connection con, Message message) {
+        if (message == null) {
+            return;
+        }
+        String sql = "INSERT INTO messages(`id_from`, `id_to`, `message`, `date`) values (?, ?, ?, ?)";
+        try (PreparedStatement prepareStatement = con.prepareStatement(sql)) {
+            prepareStatement.setInt(1, message.getIdFrom());
+            prepareStatement.setInt(2, message.getIdTo());
+            prepareStatement.setString(3, message.getMessage());
+            Calendar currenttime = Calendar.getInstance();
+            prepareStatement.setDate(4, new Date((currenttime.getTime()).getTime()));
+
+            prepareStatement.executeUpdate();
+        } catch (Exception ex) {
+            Logger.getLogger(DaoUser.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

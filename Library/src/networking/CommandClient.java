@@ -62,7 +62,7 @@ public class CommandClient {
 
     public void call(String command, Object[] parameters, boolean wait, ExecuteListener listener) {
         Runnable r = () -> {
-            try (Socket s = new Socket(ip, port);) {
+            try (Socket s = new Socket(ip, port)) {
                 OutputStream out = s.getOutputStream();
                 out.write(command.getBytes());
                 out.write(0);

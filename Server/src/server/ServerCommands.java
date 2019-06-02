@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dao.DaoUser;
+import model.Message;
 import model.User;
 import networking.Command;
 import networking.Protocol;
@@ -69,12 +70,12 @@ public class ServerCommands {
                     if (match) {
                         Integer result = res.getInt("id");
                         Protocol.sendResult(socket.getOutputStream(), result);
-                        
+
                         sql = "UPDATE users SET last_ip = ? WHERE id = ?";
                         try (PreparedStatement updateStatement = this.connection.prepareStatement(sql)) {
                             updateStatement.setString(1, lastIp);
                             updateStatement.setInt(2, result);
-                            
+
                             updateStatement.executeUpdate();
                         }
                     }
@@ -94,6 +95,7 @@ public class ServerCommands {
                 try (ResultSet rs = prepareStatement.executeQuery()) {
                     if (rs.next()) {
                         socket.getOutputStream().write(0);
+                        return;
                     }
                 }
             }
@@ -107,9 +109,9 @@ public class ServerCommands {
                 prepareStatement.setString(1, username);
                 prepareStatement.setBlob(2, new ByteArrayInputStream(passwordSh));
                 prepareStatement.setString(3, salt);
-                boolean result = prepareStatement.execute();
+                int result = prepareStatement.executeUpdate();
 
-                socket.getOutputStream().write(result ? 1 : 0);
+                socket.getOutputStream().write(result > 0 ? 1 : 0);
             }
         } catch (SQLException | NoSuchAlgorithmException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,6 +153,11 @@ public class ServerCommands {
     @Command
     private void getMessages(Socket socket, Integer id_from, Integer id_to) throws IOException {
         Protocol.sendResult(socket.getOutputStream(), DaoUser.readMessages(connection, id_from, id_to));
+    }
+
+    @Command
+    private void writeMessage(Socket socket, Message message) throws IOException {
+        DaoUser.writeMessage(connection, message);
     }
 
     public static void main(String[] args) throws IOException {
