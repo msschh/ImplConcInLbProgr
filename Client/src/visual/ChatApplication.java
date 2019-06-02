@@ -86,12 +86,16 @@ public class ChatApplication extends Application {
 
     @FXML
     private void onSend(ActionEvent event) {
-        String message = this.message.getText();
+        String messageText = this.message.getText();
         this.message.setText("");
-        this.chatConnection.sendMessage(message);
-        this.chatConnection.getMessageListener().onMessage(message);
+        this.chatConnection.sendMessage(messageText);
+        this.chatConnection.getMessageListener().onMessage(messageText);
 
-        Object[] params = new Object[]{this.chatConnection.getYou().getId(), this.chatConnection.getOther().getId(), message};
+        Message m = new Message();
+        m.setIdFrom(this.chatConnection.getYou().getId());
+        m.setIdTo(this.chatConnection.getOther().getId());
+        m.setMessage(messageText);
+        Object[] params = new Object[]{m};
         this.client.call("writeMessage", params, false);
     }
 }

@@ -82,7 +82,7 @@ public class DaoUser {
         if (message == null) {
             return;
         }
-        String sql = "INSERT INTO messages('ID_FROM', 'ID_TO', 'MESSAGE', 'DATE') values (?, ?, ?, ?)";
+        String sql = "INSERT INTO messages(`id_from`, `id_to`, `message`, `date`) values (?, ?, ?, ?)";
         try (PreparedStatement prepareStatement = con.prepareStatement(sql)) {
             prepareStatement.setInt(1, message.getIdFrom());
             prepareStatement.setInt(2, message.getIdTo());
