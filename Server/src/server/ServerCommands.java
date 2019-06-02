@@ -35,7 +35,7 @@ public class ServerCommands {
 
     public ServerCommands() {
         try {
-            this.connection = DriverManager.getConnection(DB_URL, "root", "");
+            this.connection = DriverManager.getConnection(DB_URL, "root", "xampprootpass");
         } catch (SQLException ex) {
             Logger.getLogger(ServerCommands.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -94,7 +94,7 @@ public class ServerCommands {
                 prepareStatement.setString(1, username);
                 try (ResultSet rs = prepareStatement.executeQuery()) {
                     if (rs.next()) {
-                        socket.getOutputStream().write(0);
+                        socket.getOutputStream().write(2);
                         return;
                     }
                 }

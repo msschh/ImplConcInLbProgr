@@ -116,7 +116,7 @@ public class LoginApplication extends Application {
                         Alert alert = new Alert(AlertType.INFORMATION, "User created!", ButtonType.OK);
                         alert.showAndWait();
                     });
-                } else if (success == 0) {
+                } else if (success == 2) {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(AlertType.ERROR, "Existent username!", ButtonType.OK);
                         alert.showAndWait();
