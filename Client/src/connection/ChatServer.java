@@ -3,13 +3,15 @@ package connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.User;
 import networking.Protocol;
 
 public class ChatServer implements Runnable {
 
     public static final int PORT = 5823;
-    
+
     protected boolean running;
     protected ServerSocket serverSocket;
     protected final int port;
@@ -39,21 +41,31 @@ public class ChatServer implements Runnable {
         }
     }
 
+    private void acceptConnection(Socket socket) {
+        try {
+            User other = Protocol.readResult(socket.getInputStream());
+            FixedChatConnection fcc = new FixedChatConnection(socket, this.user, other);
+            new Thread(fcc).start();
+            if (this.connectionListener != null) {
+                this.connectionListener.onConnection(fcc);
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     @Override
     public void run() {
         this.running = true;
         try {
             this.serverSocket = new ServerSocket(this.port);
             try (ServerSocket ss = this.serverSocket) {
-                Socket s = ss.accept();
-                User other = Protocol.readResult(s.getInputStream());
-                FixedChatConnection fcc = new FixedChatConnection(s, this.user, other);
-                new Thread(fcc).start();
-                if (this.connectionListener != null) {
-                    this.connectionListener.onConnection(fcc);
+                while (true) {
+                    Socket s = ss.accept();
+                    new Thread(() -> acceptConnection(s)).start();
                 }
             }
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (IOException ex) {
         }
     }
 

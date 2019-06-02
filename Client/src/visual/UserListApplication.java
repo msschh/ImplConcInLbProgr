@@ -60,6 +60,10 @@ public class UserListApplication extends Application {
         Parent root = loader.load();
         userListStage.setTitle("List of users");
         userListStage.setScene(new Scene(root, 800, 500));
+        userListStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
 
         usersListView.setOnMouseClicked(this::userClicked);
 

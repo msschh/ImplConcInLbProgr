@@ -56,8 +56,8 @@ public class ChatApplication extends Application {
         Parent root = loader.load();
         primaryStage.setTitle("Chat: " + this.chatConnection.getOther());
         primaryStage.setScene(new Scene(root, 800, 500));
-        primaryStage.show();
         primaryStage.setOnShown(this::wondowShown);
+        primaryStage.show();
 
         this.chatConnection.setMessageListener(message -> {
             this.messages.appendText(message);
