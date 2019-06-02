@@ -112,17 +112,38 @@ public class LoginApplication extends Application {
 
     @FXML
     private void createAccount(ActionEvent event) {
-        String u = this.createUsername.getText();
-        String p = this.createPassword.getText();
-        String rp = this.createRePassword.getText();
+        String usernameInput = this.createUsername.getText();
+        String passwordInput = this.createPassword.getText();
+        String retryPasswordInput = this.createRePassword.getText();
 
-        if (!p.equals(rp)) {
+        // valideaza username-ul
+        if (!InputValidator.isUsernameValid(usernameInput)) {
+            Alert usernameInvalidAlert = new Alert(AlertType.ERROR, "The username is invalid.", ButtonType.CLOSE);
+            usernameInvalidAlert.show();
+            return;
+        }
+
+        // valideaza parola
+        if (!InputValidator.isPasswordValid(passwordInput)) {
+            Alert passwordInvalidAlert = new Alert(AlertType.ERROR, "The retry password is invalid.", ButtonType.CLOSE);
+            passwordInvalidAlert.show();
+            return;
+        }
+
+        // valideaza parola de retry
+        if (!InputValidator.isPasswordValid(retryPasswordInput)) {
+            Alert passwordInvalidAlert = new Alert(AlertType.ERROR, "The password is invalid.", ButtonType.CLOSE);
+            passwordInvalidAlert.show();
+            return;
+        }
+
+        if (!passwordInput.equals(retryPasswordInput)) {
             Alert alert = new Alert(AlertType.ERROR, "Passwords do not match", ButtonType.OK);
             alert.showAndWait();
             return;
         }
 
-        Object[] parameters = new Object[]{u, p};
+        Object[] parameters = new Object[]{usernameInput, passwordInput};
         this.client.call("createUser", parameters, socket -> {
             try {
                 int success = socket.getInputStream().read();
